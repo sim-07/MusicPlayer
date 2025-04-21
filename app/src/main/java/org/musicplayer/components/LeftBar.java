@@ -1,0 +1,81 @@
+package org.musicplayer.components;
+
+import java.util.Optional;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+import org.musicplayer.scripts.ManagePlaylist;
+
+public class LeftBar extends VBox { // VBox = lista verticale di elementi
+    public LeftBar() {
+        HBox container = new HBox(10);
+
+        Label title = new Label("Playlists");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        title.setPrefWidth(200);
+
+        Image imgAdd = new Image(getClass().getResource("/icons/add.png").toExternalForm());
+        ImageView iconAdd = new ImageView(imgAdd);
+        Button createPlaylsit = new Button("", iconAdd);
+        createPlaylsit.setStyle(
+                "-fx-background-color: #333333;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 50;" +
+                        "-fx-cursor: hand;");
+
+        createPlaylsit.setOnAction(_ -> showPlaylistDialog());
+        // createPlaylsit.setOnAction(_ -> PlaylistManager.createPlaylist("aa"));
+
+        Image imgSettings = new Image(getClass().getResource("/icons/settings.png").toExternalForm());
+        ImageView iconSettings = new ImageView(imgSettings);
+        Button settings = new Button("", iconSettings);
+        settings.setStyle(
+                "-fx-background-color: #333333;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 50;" +
+                        "-fx-cursor: hand;");
+
+        container.getChildren().addAll(title, createPlaylsit, settings);
+
+        this.setPrefWidth(300);
+        this.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-padding: 40px;");
+        this.getChildren().addAll(container);
+    }
+
+    private void showPlaylistDialog() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Crea Playlist");
+        dialog.setHeaderText("Inserisci il nome della playlist");
+        dialog.setContentText("Nome:");
+
+        dialog.setGraphic(new ImageView()); // Altrimenti JavaFX mostra un icona di default
+
+        Optional<String> result = dialog.showAndWait();
+
+        // TODO controllare che il nome sia univoco
+        result.ifPresent(playlistName -> {
+            if (playlistName.trim().isEmpty()) {
+                showErrorDialog("Il nome della playlist non può essere vuoto");
+            } else {
+                ManagePlaylist.createPlaylist(playlistName);
+            }
+
+        });
+    }
+
+    private void showErrorDialog(String error) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Errore");
+        alert.setHeaderText(error);
+        alert.setContentText("");
+        alert.showAndWait();
+    }
+
+}
