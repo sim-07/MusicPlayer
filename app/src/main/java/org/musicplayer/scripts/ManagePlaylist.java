@@ -4,8 +4,11 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ManagePlaylist {
 
@@ -16,7 +19,8 @@ public class ManagePlaylist {
         try {
             if (dbFile.exists()) {
 
-                try (Connection conn = DriverManager.getConnection(url)) {
+                try (Connection conn = DriverManager.getConnection(url)) { // conn si chiude in automatico dopo aver
+                                                                           // finito
 
                     String insertSQL = "INSERT INTO playlists (name) VALUES (?)";
                     try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) { // PreparedStatement sicuro a
@@ -79,12 +83,34 @@ public class ManagePlaylist {
         }
     }
 
-    public static void fetchPlaylist() {
+    public static List<Playlist> fetchAllPlaylist() {
+        File dbFile = new File("db/playlists.db");
+        String url = "jdbc:sqlite:db/playlists.db";
+        List<Playlist> playlists = new ArrayList<>();
+
         try {
+            if (dbFile.exists()) {
+                String sql = "SELECT * FROM playlists";
+
+                try (Connection conn = DriverManager.getConnection(url);
+                        Statement stmt = conn.createStatement();
+                        ResultSet rs = stmt.executeQuery(sql)) {
+
+                    while (rs.next()) {
+                        Playlist PlName = new Playlist(rs.getString("id"), rs.getString("name"));
+                        playlists.add(PlName);
+                    }
+
+                }
+            } else {
+                createDatabase();
+            }
 
         } catch (Exception e) {
-            System.out.println("Errore fetchPlaylist: " + e.getMessage());
+            System.out.println("Errore fetchAllPlaylist: " + e.getMessage());
         }
+
+        return playlists;
     }
 
 }

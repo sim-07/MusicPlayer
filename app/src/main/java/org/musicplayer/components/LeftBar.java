@@ -12,8 +12,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import org.musicplayer.scripts.ManagePlaylist;
+import org.musicplayer.components.PlaylistSection;
 
 public class LeftBar extends VBox { // VBox = lista verticale di elementi
+
     public LeftBar() {
         HBox container = new HBox(10);
 
@@ -31,7 +33,6 @@ public class LeftBar extends VBox { // VBox = lista verticale di elementi
                         "-fx-cursor: hand;");
 
         createPlaylsit.setOnAction(_ -> showPlaylistDialog());
-        // createPlaylsit.setOnAction(_ -> PlaylistManager.createPlaylist("aa"));
 
         Image imgSettings = new Image(getClass().getResource("/icons/settings.png").toExternalForm());
         ImageView iconSettings = new ImageView(imgSettings);
@@ -48,6 +49,9 @@ public class LeftBar extends VBox { // VBox = lista verticale di elementi
         this.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-padding: 40px;");
         this.getChildren().addAll(container);
     }
+
+
+
 
     private void showPlaylistDialog() {
         TextInputDialog dialog = new TextInputDialog();
