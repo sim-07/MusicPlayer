@@ -2,6 +2,7 @@ package org.musicplayer.components;
 
 import java.util.Optional;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -20,6 +21,7 @@ public class LeftBar extends VBox { // vbox = lista verticale di elementi
 
     public LeftBar(MiddleSection middleSection) {
         HBox hContainer = new HBox(10);
+        HBox.setMargin(hContainer, new Insets(0, 0, 20, 0));
 
         Label title = new Label("Playlists");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
@@ -48,6 +50,7 @@ public class LeftBar extends VBox { // vbox = lista verticale di elementi
         hContainer.getChildren().addAll(title, createPlaylsit, settings);
 
         this.plSection = new PlaylistSection(ManagePlaylist.fetchAllPlaylist(), middleSection);
+        VBox.setMargin(plSection, new Insets(40, 0, 0, 0));
 
         this.setPrefWidth(300);
         this.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-padding: 40px;");

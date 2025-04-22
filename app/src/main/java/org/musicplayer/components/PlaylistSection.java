@@ -26,11 +26,10 @@ public class PlaylistSection extends VBox {
             button.setStyle(
                     "-fx-background-color:rgb(31, 31, 31);" +
                             "-fx-text-fill: white;" +
-                            "-fx-background-radius: 8px;" +
                             "-fx-cursor: hand;" +
                             "-fx-padding: 8px 16px;");
             button.setMaxWidth(Double.MAX_VALUE);
-            VBox.setMargin(button, new Insets(10, 0, 0, 0));
+            VBox.setMargin(button, new Insets(5, 0, 0, 0));
             button.setOnAction(_ -> {
                 List<Song> songs = ManagePlaylist.fetchSongs(playlist.getName());
                 System.out.println("Playlist selezionata: " + playlist.getName());
