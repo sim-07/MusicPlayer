@@ -1,7 +1,5 @@
 package org.musicplayer.components;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.Alert;
@@ -14,7 +12,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import org.musicplayer.scripts.ManagePlaylist;
-import org.musicplayer.scripts.Playlist;
 
 public class LeftBar extends VBox { // vbox = lista verticale di elementi
 
