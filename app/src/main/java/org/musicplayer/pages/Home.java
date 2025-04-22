@@ -4,11 +4,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.Label;
 
-import org.musicplayer.components.LeftBar;
+import org.musicplayer.components.*;
 
-public class Home extends BorderPane { // Per gestire vari elementi 
+public class Home extends BorderPane {
     public Home() {
-        LeftBar leftBar = new LeftBar();
+        MiddleSection middleSection = new MiddleSection(); // passo lo stesso oggetto middlesection ad ogni componente
+        LeftBar leftBar = new LeftBar(middleSection);
+
         this.setLeft(leftBar);
+        this.setCenter(middleSection);
     }
 }

@@ -21,7 +21,7 @@ public class LeftBar extends VBox { // vbox = lista verticale di elementi
     // final = posso poi aggiornare senza sostituire
     private final PlaylistSection plSection;
 
-    public LeftBar() {
+    public LeftBar(MiddleSection middleSection) {
         HBox hContainer = new HBox(10);
 
         Label title = new Label("Playlists");
@@ -50,7 +50,7 @@ public class LeftBar extends VBox { // vbox = lista verticale di elementi
 
         hContainer.getChildren().addAll(title, createPlaylsit, settings);
 
-        this.plSection = new PlaylistSection(ManagePlaylist.fetchAllPlaylist());
+        this.plSection = new PlaylistSection(ManagePlaylist.fetchAllPlaylist(), middleSection);
 
         this.setPrefWidth(300);
         this.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-padding: 40px;");

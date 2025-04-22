@@ -2,16 +2,19 @@ package org.musicplayer.components;
 
 import java.util.List;
 
-import org.musicplayer.scripts.Playlist;
+import org.musicplayer.scripts.*;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 public class PlaylistSection extends VBox {
 
-    public PlaylistSection(List<Playlist> playlists) {
-        super(10); // passo 10 a VBox per impostare lo spazio verticale
+    private MiddleSection middleSection;
+
+    public PlaylistSection(List<Playlist> playlists, MiddleSection middleSection) {
+        super(10); // spazio verticale
+        this.middleSection = middleSection;
         updatePl(playlists);
     }
 
@@ -20,7 +23,21 @@ public class PlaylistSection extends VBox {
         for (Playlist playlist : playlists) {
 
             Button button = new Button(playlist.getName());
-            
+            button.setStyle(
+                    "-fx-background-color:rgb(31, 31, 31);" +
+                            "-fx-text-fill: white;" +
+                            "-fx-background-radius: 8px;" +
+                            "-fx-cursor: hand;" +
+                            "-fx-padding: 8px 16px;");
+            button.setMaxWidth(Double.MAX_VALUE);
+            VBox.setMargin(button, new Insets(10, 0, 0, 0));
+            button.setOnAction(_ -> {
+                List<Song> songs = ManagePlaylist.fetchSongs(playlist.getName());
+                System.out.println("Playlist selezionata: " + playlist.getName());
+                this.middleSection.setPlName(playlist.getName());
+                this.middleSection.updateSongs(songs);
+            });
+
             this.getChildren().add(button);
 
         }

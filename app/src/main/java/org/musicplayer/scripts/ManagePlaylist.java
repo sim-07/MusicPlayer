@@ -13,18 +13,16 @@ import java.util.List;
 public class ManagePlaylist {
 
     public static void createPlaylist(String playlistName) {
-        File dbFile = new File("db/playlists.db");
-        String url = "jdbc:sqlite:db/playlists.db";
+        File dbFile = new File("db/data.db");
+        String url = "jdbc:sqlite:db/data.db";
 
         try {
             if (dbFile.exists()) {
 
-                try (Connection conn = DriverManager.getConnection(url)) { // conn si chiude in automatico dopo aver
-                                                                           // finito
+                try (Connection conn = DriverManager.getConnection(url)) { // conn si chiude in automatico dopo aver finito
 
                     String insertSQL = "INSERT INTO playlists (name) VALUES (?)";
-                    try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) { // PreparedStatement sicuro a
-                                                                                       // sqlinjection
+                    try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) { // PreparedStatement sicuro a sqlinjection
                         pstmt.setString(1, playlistName);
                         pstmt.executeUpdate();
                         System.out.println("Playlist '" + playlistName + "' creata.");
@@ -45,7 +43,7 @@ public class ManagePlaylist {
     }
 
     private static void createDatabase() {
-        String url = "jdbc:sqlite:db/playlists.db";
+        String url = "jdbc:sqlite:db/data.db";
 
         new File("db").mkdirs();
 
@@ -55,7 +53,8 @@ public class ManagePlaylist {
                         CREATE TABLE IF NOT EXISTS songs (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                             title TEXT NOT NULL,
-                            path TEXT NOT NULL UNIQUE
+                            path TEXT NOT NULL UNIQUE,
+                            playlist TEXT NOT NULL
                         );
                     """);
 
@@ -63,16 +62,6 @@ public class ManagePlaylist {
                         CREATE TABLE IF NOT EXISTS playlists (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                             name TEXT NOT NULL UNIQUE
-                        );
-                    """);
-
-            stmt.execute("""
-                        CREATE TABLE IF NOT EXISTS song_playlist (
-                            song_id INTEGER,
-                            playlist_id INTEGER,
-                            FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE,
-                            FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE,
-                            PRIMARY KEY (song_id, playlist_id)
                         );
                     """);
 
@@ -84,8 +73,8 @@ public class ManagePlaylist {
     }
 
     public static List<Playlist> fetchAllPlaylist() {
-        File dbFile = new File("db/playlists.db");
-        String url = "jdbc:sqlite:db/playlists.db";
+        File dbFile = new File("db/data.db");
+        String url = "jdbc:sqlite:db/data.db";
         List<Playlist> playlists = new ArrayList<>();
 
         try {
@@ -111,6 +100,42 @@ public class ManagePlaylist {
         }
 
         return playlists;
+    }
+
+
+    public static List<Song> fetchSongs(String plName) {
+        File dbFile = new File("db/data.db");
+        String url = "jdbc:sqlite:db/data.db";
+        List<Song> songs = new ArrayList<>();
+    
+        try {
+            if (dbFile.exists()) {
+                String sql = "SELECT id, title, path FROM songs WHERE playlist = ?";
+    
+                try (Connection conn = DriverManager.getConnection(url);
+                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    
+                    pstmt.setString(1, plName);
+    
+                    try (ResultSet rs = pstmt.executeQuery()) {
+                        while (rs.next()) {
+                            String id = rs.getString("id");
+                            String title = rs.getString("title");
+                            String path = rs.getString("path");
+    
+                            songs.add(new Song(id, title, path));
+                        }
+                    }
+                }
+            } else {
+                createDatabase();
+            }
+    
+        } catch (Exception e) {
+            System.out.println("Errore fetchAllSongs: " + e.getMessage());
+        }
+    
+        return songs;
     }
 
 }
