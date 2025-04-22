@@ -1,5 +1,7 @@
 package org.musicplayer.components;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.Alert;
@@ -12,12 +14,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import org.musicplayer.scripts.ManagePlaylist;
-import org.musicplayer.components.PlaylistSection;
+import org.musicplayer.scripts.Playlist;
 
-public class LeftBar extends VBox { // VBox = lista verticale di elementi
+public class LeftBar extends VBox { // vbox = lista verticale di elementi
+
+    // final = posso poi aggiornare senza sostituire
+    private final PlaylistSection plSection;
 
     public LeftBar() {
-        HBox container = new HBox(10);
+        HBox hContainer = new HBox(10);
 
         Label title = new Label("Playlists");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
@@ -43,15 +48,14 @@ public class LeftBar extends VBox { // VBox = lista verticale di elementi
                         "-fx-background-radius: 50;" +
                         "-fx-cursor: hand;");
 
-        container.getChildren().addAll(title, createPlaylsit, settings);
+        hContainer.getChildren().addAll(title, createPlaylsit, settings);
+
+        this.plSection = new PlaylistSection(ManagePlaylist.fetchAllPlaylist());
 
         this.setPrefWidth(300);
         this.setStyle("-fx-border-color: gray; -fx-border-width: 1px; -fx-padding: 40px;");
-        this.getChildren().addAll(container);
+        this.getChildren().addAll(hContainer, plSection);
     }
-
-
-
 
     private void showPlaylistDialog() {
         TextInputDialog dialog = new TextInputDialog();
@@ -59,16 +63,17 @@ public class LeftBar extends VBox { // VBox = lista verticale di elementi
         dialog.setHeaderText("Inserisci il nome della playlist");
         dialog.setContentText("Nome:");
 
-        dialog.setGraphic(new ImageView()); // Altrimenti JavaFX mostra un icona di default
+        dialog.setGraphic(new ImageView()); // altrimenti javafx mostra un icona di default
 
         Optional<String> result = dialog.showAndWait();
 
         // TODO controllare che il nome sia univoco
         result.ifPresent(playlistName -> {
             if (playlistName.trim().isEmpty()) {
-                showErrorDialog("Il nome della playlist non può essere vuoto");
+                showErrorDialog("Aggiungi un nome alla playlist");
             } else {
                 ManagePlaylist.createPlaylist(playlistName);
+                plSection.updatePl(ManagePlaylist.fetchAllPlaylist());
             }
 
         });
