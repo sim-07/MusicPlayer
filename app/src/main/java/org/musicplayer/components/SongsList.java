@@ -9,14 +9,14 @@ import org.musicplayer.scripts.Song;
 public class SongsList extends VBox {
 
     public SongsList() {
-        super(10);
+        super(5);
         Label emptyLabel = new Label("Nessuna playlist selezionata.");
         emptyLabel.setStyle("-fx-text-fill: gray; -fx-font-style: italic;");
         this.getChildren().add(emptyLabel);
     }
 
     public SongsList(List<Song> songs) {
-        super(10);
+        super(5);
         updateSongs(songs);
     }
 
@@ -25,10 +25,12 @@ public class SongsList extends VBox {
         for (Song song : songs) {
             Button button = new Button(song.getName());
             button.setStyle(
-                    "-fx-background-color:rgb(168, 168, 168);" +
-                            "-fx-text-fill: white;" +
+                    "-fx-background-color: rgb(247, 247, 247);" +
+                            "-fx-text-fill: black;" +
                             "-fx-cursor: hand;" +
-                            "-fx-padding: 8px 16px;");
+                            "-fx-padding: 8px 16px;" +
+                            "-fx-border-color: #cccccc;" +
+                            "-fx-border-width: 1px;");
             button.setMaxWidth(Double.MAX_VALUE);
 
             this.getChildren().add(button);

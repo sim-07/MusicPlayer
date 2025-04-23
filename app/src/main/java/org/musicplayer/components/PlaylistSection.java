@@ -31,10 +31,9 @@ public class PlaylistSection extends VBox {
             button.setMaxWidth(Double.MAX_VALUE);
             VBox.setMargin(button, new Insets(5, 0, 0, 0));
             button.setOnAction(_ -> {
-                List<Song> songs = ManagePlaylist.fetchSongs(playlist.getName());
-                System.out.println("Playlist selezionata: " + playlist.getName());
+                //List<Song> songs = ManagePlaylist.fetchSongs(playlist.getName());
                 this.middleSection.setPlName(playlist.getName());
-                this.middleSection.updateSongs(songs);
+                this.middleSection.updateSongs();
             });
 
             this.getChildren().add(button);
