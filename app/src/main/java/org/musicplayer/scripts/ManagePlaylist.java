@@ -19,7 +19,8 @@ public class ManagePlaylist {
         try {
             if (dbFile.exists()) {
 
-                try (Connection conn = DriverManager.getConnection(url)) { // conn si chiude in automatico dopo aver finito
+                try (Connection conn = DriverManager.getConnection(url)) { // conn si chiude in automatico dopo aver
+                                                                           // finito
 
                     String insertSQL = "INSERT INTO playlists (name) VALUES (?)";
                     try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
@@ -64,7 +65,8 @@ public class ManagePlaylist {
                         );
                     """);
 
-            // collego songs e playlists. Se elimino un dato in una si elimina anche nelle altre 
+            // collego songs e playlists. Se elimino un dato in una si elimina anche nelle
+            // altre
             stmt.execute("""
                         CREATE TABLE songs_playlist (
                             song_id INTEGER,
@@ -119,10 +121,11 @@ public class ManagePlaylist {
 
         try {
             if (dbFile.exists()) {
-                String sql = "SELECT songs.id, songs.title, songs.path FROM songs JOIN songs_playlist ON songs.id = songs_playlist.song_id JOIN playlists ON playlists.id = songs_playlist.playlist_id WHERE playlists.name = ?"; // seleziono titolo, path e id in base alla tabella intermedia
+                // seleziono titolo, path e id in base alla tabella intermedia
+                String sql = "SELECT songs.id, songs.title, songs.path FROM songs JOIN songs_playlist ON songs.id = songs_playlist.song_id JOIN playlists ON playlists.id = songs_playlist.playlist_id WHERE playlists.name = ?";
 
                 try (Connection conn = DriverManager.getConnection(url);
-                    PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                        PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
                     pstmt.setString(1, plName);
 
@@ -147,80 +150,76 @@ public class ManagePlaylist {
         return songs;
     }
 
-    public static void addSongs(String songName, String path, String plName) {
+    public static void addSongsToPlaylist(String songName, String path, String plName) {
         File dbFile = new File("db/data.db");
         String url = "jdbc:sqlite:db/data.db";
 
         try {
-            try (Connection conn = DriverManager.getConnection(url)) {
-                
-                String fetchExSongs = "SELECT * FROM songs WHERE title = ?";
-                try (PreparedStatement pstmt = conn.prepareStatement(fetchExSongs)) {
+            if (dbFile.exists()) {
+
+                try (Connection conn = DriverManager.getConnection(url)) {
+
+                    // cerco id canzone
+                    String fetchExSongs = "SELECT id FROM songs WHERE title = ?";
+                    try (PreparedStatement pstmt = conn.prepareStatement(fetchExSongs)) {
+                        pstmt.setString(1, songName);
+
+                        try (ResultSet rs = pstmt.executeQuery()) {
+
+                            int songId = 0;
+                            if (rs.next()) {
+                                songId = rs.getInt("id");
+                            } else {
+                                // la canzone non c'è ancora, la aggiungo a songs e prendo l'id
+
+                                String insertSongSQL = "INSERT INTO songs (title, path) VALUES (?, ?)";
+                                try (PreparedStatement insertSongPstmt = conn.prepareStatement(insertSongSQL,
+                                        Statement.RETURN_GENERATED_KEYS)) {
+                                    insertSongPstmt.setString(1, songName);
+                                    insertSongPstmt.setString(2, path);
+                                    insertSongPstmt.executeUpdate();
+
+                                    try (ResultSet generatedKeys = insertSongPstmt.getGeneratedKeys()) {
+                                        if (generatedKeys.next()) {
+                                            songId = generatedKeys.getInt(1); // id appena generato
+                                        }
+                                    }
+                                }
+                            }
+
+                            // cerco id playlist in base al nome passato
+                            String fetchPlId = "SELECT id FROM playlists WHERE name = ?";
+                            try (PreparedStatement playlistPstmt = conn.prepareStatement(fetchPlId)) {
+                                playlistPstmt.setString(1, plName);
+                                playlistPstmt.executeQuery();
+
+                                try (ResultSet playlistResult = playlistPstmt.executeQuery()) {
+                                    if (playlistResult.next()) {
+                                        int plId = playlistResult.getInt("id");
+
+                                        // inserisco playlist id e song id
+                                        String addExSong = "INSERT INTO songs_playlist (song_id, playlist_id) VALUES (?, ?)";
+                                        try (PreparedStatement addSongPlPstmt = conn.prepareStatement(addExSong)) {
+                                            addSongPlPstmt.setInt(1, songId);
+                                            addSongPlPstmt.setInt(2, plId);
+                                            addSongPlPstmt.executeUpdate();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (SQLException e) {
+                        System.out.println("Errore addSongs in1: " + e.getMessage());
+                    }
 
                 } catch (SQLException e) {
-                    System.out.println("Errore addSongs in: " + e.getMessage());
+                    System.out.println("Errore addSongs in2: " + e.getMessage());
                 }
 
-            } catch (SQLException e) {
-                System.out.println("Errore addSongs in: " + e.getMessage());
             }
         } catch (Exception e) {
-            System.out.println("Errore addSongs e: " + e.getMessage());
+            System.out.println("Errore addSongs es: " + e.getMessage());
         }
+
     }
-
-    // public static void addSongs(String songName, String path, String plName) {
-    //     File dbFile = new File("db/data.db");
-    //     String url = "jdbc:sqlite:db/data.db";
-    
-    //     try {
-    //         if (dbFile.exists()) {
-    //             try (Connection conn = DriverManager.getConnection(url)) {
-    //                 String insertSongSQL = "INSERT INTO songs (title, path) VALUES (?, ?)";
-    //                 try (PreparedStatement pstmt = conn.prepareStatement(insertSongSQL, Statement.RETURN_GENERATED_KEYS)) {
-    //                     pstmt.setString(1, songName);
-    //                     pstmt.setString(2, path);
-    //                     pstmt.executeUpdate();
-    
-    //                     ResultSet generatedKeys = pstmt.getGeneratedKeys(); // recupero l'id che è appena stato creato
-    //                     if (generatedKeys.next()) {
-    //                         int songId = generatedKeys.getInt(1);
-    
-    //                         String selectPlaylistSQL = "SELECT id FROM playlists WHERE name = ?"; // cerco l'id della playlist
-    //                         try (PreparedStatement playlistStmt = conn.prepareStatement(selectPlaylistSQL)) {
-    //                             playlistStmt.setString(1, plName);
-    //                             ResultSet playlistResult = playlistStmt.executeQuery();
-    
-    //                             if (playlistResult.next()) {
-    //                                 int playlistId = playlistResult.getInt("id");
-    
-    //                                 String insertPlaylistSQL = "INSERT INTO songs_playlist (song_id, playlist_id) VALUES (?, ?)"; // collego l'id della playlsit con quello della canzone
-    //                                 try (PreparedStatement playlistPstmt = conn.prepareStatement(insertPlaylistSQL)) {
-    //                                     playlistPstmt.setInt(1, songId);
-    //                                     playlistPstmt.setInt(2, playlistId);
-    //                                     playlistPstmt.executeUpdate();
-    //                                 }
-    //                             } else {
-    //                                 System.out.println("Playlist non trovata: " + plName);
-    //                             }
-    //                         } catch (SQLException e) {
-    //                             System.out.println("Errore songs_playlist: " + e.getMessage());
-    //                         }
-    //                     }
-    //                 } catch (SQLException e) {
-    //                     System.out.println("Errore addSongs: " + e.getMessage());
-    //                 }
-    
-    //             } catch (SQLException e) {
-    //                 System.out.println("Errore db: " + e.getMessage());
-    //             }
-    //         } else {
-    //             createDatabase();
-    //         }
-    
-    //     } catch (Exception e) {
-    //         System.out.println("Errore createPlaylist: " + e.getMessage());
-    //     }
-    // }
-
 }

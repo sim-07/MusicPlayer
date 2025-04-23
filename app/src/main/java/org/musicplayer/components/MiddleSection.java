@@ -13,14 +13,17 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
 
+import org.musicplayer.pages.Home;
 import org.musicplayer.scripts.ManagePlaylist;
 
 public class MiddleSection extends VBox {
     private SongsList songsList;
     private Label plNameLabel;
     private Button addToPlaylist; // per renderla accessibile anche a setPlName
+    private Home home;
 
-    public MiddleSection() {
+    public MiddleSection(Home home) {
+        this.home = home;
         plNameLabel = new Label();
         plNameLabel.setStyle("-fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;");
         VBox.setMargin(plNameLabel, new Insets(20, 0, 0, 10));
@@ -39,7 +42,7 @@ public class MiddleSection extends VBox {
             selectFile();
         });
 
-        songsList = new SongsList();
+        songsList = new SongsList(home);
         VBox.setMargin(songsList, new Insets(40, 10, 0, 10));
 
         this.getChildren().addAll(plNameLabel, addToPlaylist, songsList);
@@ -47,7 +50,7 @@ public class MiddleSection extends VBox {
 
     public void updateSongs() {
         List<Song> songs = ManagePlaylist.fetchSongs(plNameLabel.getText());
-        songsList.updateSongs(songs);
+        songsList.updateSongs(songs, home);
     }
 
     public void setPlName(String name) {
@@ -71,7 +74,7 @@ public class MiddleSection extends VBox {
                 String filePath = file.getAbsolutePath();
 
                 System.out.println(fileName + " " +filePath);
-                ManagePlaylist.addSongs(fileName, filePath, plNameLabel.getText());
+                ManagePlaylist.addSongsToPlaylist(fileName, filePath, plNameLabel.getText());
                 updateSongs();
                 
             }
