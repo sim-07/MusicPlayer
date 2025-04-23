@@ -19,8 +19,7 @@ public class ManagePlaylist {
         try {
             if (dbFile.exists()) {
 
-                try (Connection conn = DriverManager.getConnection(url)) { // conn si chiude in automatico dopo aver
-                                                                           // finito
+                try (Connection conn = DriverManager.getConnection(url)) { // conn si chiude in automatico dopo aver finito
 
                     String insertSQL = "INSERT INTO playlists (name) VALUES (?)";
                     try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
@@ -65,8 +64,7 @@ public class ManagePlaylist {
                         );
                     """);
 
-            // collego songs e playlists. Se elimino un dato in una si elimina anche nelle
-            // altre
+            // collego songs e playlists. Se elimino un dato in una si elimina anche nelle altre
             stmt.execute("""
                         CREATE TABLE songs_playlist (
                             song_id INTEGER,

@@ -13,13 +13,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import org.musicplayer.scripts.ManagePlaylist;
+import org.musicplayer.pages.*;
 
 public class LeftBar extends VBox { // vbox = lista verticale di elementi
 
     // final = posso poi aggiornare senza sostituire
     private final PlaylistSection plSection;
 
-    public LeftBar(MiddleSection middleSection) {
+    public LeftBar(MiddleSection middleSection, Home home) {
         HBox hContainer = new HBox(10);
         HBox.setMargin(hContainer, new Insets(0, 0, 20, 0));
 
@@ -46,6 +47,10 @@ public class LeftBar extends VBox { // vbox = lista verticale di elementi
                         "-fx-text-fill: white;" +
                         "-fx-background-radius: 50;" +
                         "-fx-cursor: hand;");
+        settings.setOnAction(_ -> {
+            SettingsPage sPage = new SettingsPage(home, middleSection);
+            home.showPage(sPage);
+        });
 
         hContainer.getChildren().addAll(title, createPlaylsit, settings);
 
