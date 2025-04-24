@@ -32,6 +32,7 @@ public class PlaylistSection extends VBox {
             VBox.setMargin(button, new Insets(5, 0, 0, 0));
             button.setOnAction(_ -> {
                 this.middleSection.setPlName(playlist.getName());
+                this.middleSection.setPlId(playlist.getId());
                 this.middleSection.updateSongs();
             });
 

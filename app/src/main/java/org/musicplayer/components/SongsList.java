@@ -24,6 +24,17 @@ public class SongsList extends VBox {
     }
 
     public void updateSongs(List<Song> songs, Home home) {
+
+        this.getChildren().clear();
+
+        if (songs == null || songs.isEmpty()) {
+            Label emptyLabel = new Label("Nessuna canzone nella playlist.");
+            emptyLabel.setStyle("-fx-text-fill: gray; -fx-font-style: italic;");
+            this.getChildren().add(emptyLabel);
+            return;
+        }
+
+
         VBox songList = new VBox();
 
         for (Song song : songs) {

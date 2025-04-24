@@ -8,6 +8,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 import java.io.File;
+import java.util.List;
 
 import org.musicplayer.components.*;
 import org.musicplayer.scripts.*;
@@ -16,10 +17,14 @@ public class Home extends BorderPane {
     private Song currentSong;
     private MediaPlayer mediaPlayer;
     private PlayerControls plControls;
+    private PlaylistSection playlistSection;
+    private MiddleSection middleSection;
 
     public Home() {
-        MiddleSection middleSection = new MiddleSection(this); // passo lo stesso oggetto middlesection ad ogni componente
-        LeftBar leftBar = new LeftBar(middleSection, this);
+
+        middleSection = new MiddleSection(this);
+        playlistSection = new PlaylistSection(ManagePlaylist.fetchAllPlaylist(), middleSection);
+        LeftBar leftBar = new LeftBar(middleSection, playlistSection, this);
         plControls = new PlayerControls(this);
 
         HBox plcontrols = new HBox(plControls); // metto plcontrols in un hbox per centrarlo orizzontalmente
@@ -46,22 +51,22 @@ public class Home extends BorderPane {
         mediaPlayer = new MediaPlayer(media);
         mediaPlayer.play();
 
-        plControls.setPlayBt(true);
+        plControls.setMediaPlayer(mediaPlayer);
+        plControls.setPlayingBt(true);
+        plControls.manageMediaPl();
+    }
+
+    public void updatePlaylists() {
+        List<Playlist> allPl = ManagePlaylist.fetchAllPlaylist();
+        playlistSection.updatePl(allPl);
+    
+        middleSection.setPlName("");
+        middleSection.updateSongs();
     }
 
     public Song getCurrentSong() {
         return currentSong;
     }
 
-    public void pauseSong() {
-        if (mediaPlayer != null) mediaPlayer.pause();
-    }
     
-    public void playSong() {
-        if (mediaPlayer != null) mediaPlayer.play();
-    }
-    
-    public void stopSong() {
-        if (mediaPlayer != null) mediaPlayer.stop();
-    }
 }

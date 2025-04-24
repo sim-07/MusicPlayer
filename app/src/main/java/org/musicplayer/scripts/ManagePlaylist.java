@@ -96,7 +96,7 @@ public class ManagePlaylist {
                         ResultSet rs = stmt.executeQuery(sql)) {
 
                     while (rs.next()) {
-                        Playlist PlName = new Playlist(rs.getString("id"), rs.getString("name"));
+                        Playlist PlName = new Playlist(rs.getInt("id"), rs.getString("name"));
                         playlists.add(PlName);
                     }
 
@@ -110,6 +110,31 @@ public class ManagePlaylist {
         }
 
         return playlists;
+    }
+
+    public static void deletePlaylist(int playlistId) {
+        File dbFile = new File("db/data.db");
+        String url = "jdbc:sqlite:db/data.db";
+
+        try {
+            if (dbFile.exists()) {
+                try (Connection conn = DriverManager.getConnection(url)) {
+                    // per eliminare in automatico anche le righe in songs_playlist
+                    try (Statement pragma = conn.createStatement()) {
+                        pragma.execute("PRAGMA foreign_keys = ON;");
+                    }
+
+                    String deleteSQL = "DELETE FROM playlists WHERE id = ?";
+                    try (PreparedStatement pstmt = conn.prepareStatement(deleteSQL)) {
+                        pstmt.setInt(1, playlistId);
+                        int affected = pstmt.executeUpdate();
+                        System.out.println("Eliminate " + affected + " playlist con id=" + playlistId);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Errore deletePlaylist: " + e.getMessage());
+        }
     }
 
     public static List<Song> fetchSongs(String plName) {

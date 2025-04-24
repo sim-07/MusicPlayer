@@ -8,6 +8,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.control.Slider;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -21,6 +23,7 @@ public class PlayerControls extends HBox {
     private Button nextButton;
     private Button previousButton;
     private Slider progressSlider;
+    private MediaPlayer mediapl;
 
     public PlayerControls(Home home) {
         Image imgPlay = new Image(getClass().getResource("/icons/play.png").toExternalForm());
@@ -39,24 +42,26 @@ public class PlayerControls extends HBox {
         pauseButton.setManaged(false);
 
         hboxButtons.getChildren().addAll(previousButton, playButton, pauseButton, nextButton);
+        hboxButtons.setAlignment(Pos.CENTER);
 
         progressSlider = new Slider(); // slider per andare avanti/indietro nella canzone
         progressSlider.setMin(0);
         progressSlider.setMax(100);
         progressSlider.setValue(0);
-        progressSlider.setPrefWidth(200);
+        progressSlider.setPrefWidth(250);
         progressSlider.setStyle("-fx-cursor: hand;");
+        
 
         playButton.setOnAction(_ -> {
-            home.playSong();
+            playSong();
 
-            setPlayBt(true);
+            setPlayingBt(true);
         });
 
         pauseButton.setOnAction(_ -> {
-            home.pauseSong();
+            pauseSong();
 
-            setPlayBt(false);
+            setPlayingBt(false);
         });
 
         VBox vbox = new VBox(10);
@@ -67,7 +72,42 @@ public class PlayerControls extends HBox {
         this.getChildren().addAll(vbox);
     }
 
-    public void setPlayBt(boolean play) {
+    public void manageMediaPl() {
+        mediapl.setOnReady(() -> {
+            Duration total = mediapl.getMedia().getDuration();
+            progressSlider.setMax(total.toSeconds()); // metto la durata in secondi del brano come massimo per lo slider
+        });
+    
+        mediapl.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+            progressSlider.setValue(newTime.toSeconds());
+        });
+
+        // per andare avanti o indietro cliccando sullo slider
+        progressSlider.valueProperty().addListener((obs, oldVal, newVal) -> { 
+            if (progressSlider.isPressed()) {
+                mediapl.seek(Duration.seconds(newVal.doubleValue()));
+            }
+        });
+    
+        // per andare avanti o indietro trascinando lo slider
+        progressSlider.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
+            if (!isChanging) {
+                mediapl.seek(Duration.seconds(progressSlider.getValue()));
+                setPlayingBt(true);
+                mediapl.play();
+            } else {
+                System.out.println("Pausasl");
+                setPlayingBt(false);
+                mediapl.pause();
+            }
+        });
+
+        mediapl.setOnEndOfMedia(() -> {
+            // prossima canzone
+        });
+    }
+
+    public void setPlayingBt(boolean play) { // true = c'è una canzone in riproduzione
         if (play) {
             playButton.setVisible(false);
             playButton.setManaged(false); // con managed a false la pagina si comporta come se non ci fosse il bottone
@@ -97,5 +137,19 @@ public class PlayerControls extends HBox {
                         "-fx-cursor: hand;" +
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 4, 0, 0, 1);");
         return button;
+    }
+
+    public void pauseSong() {
+        if (mediapl != null) mediapl.pause();
+        System.out.println("pause");
+    }
+    
+    public void playSong() {
+        if (mediapl != null) mediapl.play();
+        System.out.println("play");
+    }
+
+    public void setMediaPlayer(MediaPlayer mediapl) {
+        this.mediapl = mediapl;
     }
 }

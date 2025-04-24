@@ -20,7 +20,9 @@ public class LeftBar extends VBox { // vbox = lista verticale di elementi
     // final = posso poi aggiornare senza sostituire
     private final PlaylistSection plSection;
 
-    public LeftBar(MiddleSection middleSection, Home home) {
+    public LeftBar(MiddleSection middleSection, PlaylistSection playlistSection, Home home) {
+        this.plSection = playlistSection;
+
         HBox hContainer = new HBox(10);
         HBox.setMargin(hContainer, new Insets(0, 0, 20, 0));
 
@@ -30,14 +32,14 @@ public class LeftBar extends VBox { // vbox = lista verticale di elementi
 
         Image imgAdd = new Image(getClass().getResource("/icons/add.png").toExternalForm());
         ImageView iconAdd = new ImageView(imgAdd);
-        Button createPlaylsit = new Button("", iconAdd);
-        createPlaylsit.setStyle(
+        Button createPlaylist = new Button("", iconAdd);
+        createPlaylist.setStyle(
                 "-fx-background-color: #333333;" +
                         "-fx-text-fill: white;" +
                         "-fx-background-radius: 50;" +
                         "-fx-cursor: hand;");
 
-        createPlaylsit.setOnAction(_ -> showPlaylistDialog());
+        createPlaylist.setOnAction(_ -> showPlaylistDialog());
 
         Image imgSettings = new Image(getClass().getResource("/icons/settings.png").toExternalForm());
         ImageView iconSettings = new ImageView(imgSettings);
@@ -52,9 +54,8 @@ public class LeftBar extends VBox { // vbox = lista verticale di elementi
             home.showPage(sPage);
         });
 
-        hContainer.getChildren().addAll(title, createPlaylsit, settings);
+        hContainer.getChildren().addAll(title, createPlaylist, settings);
 
-        this.plSection = new PlaylistSection(ManagePlaylist.fetchAllPlaylist(), middleSection);
         VBox.setMargin(plSection, new Insets(40, 0, 0, 0));
 
         this.setPrefWidth(300);
