@@ -63,7 +63,7 @@ public class Home extends BorderPane {
         plControls.setMediaPlayer(mediaPlayer);
         plControls.setPlayingBt(true);
 
-        plControls.manageMediaPl(queueObj);
+        plControls.manageMediaPl(queueObj, currentSong);
     }
 
     public void updatePlaylists() {

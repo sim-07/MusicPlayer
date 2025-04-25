@@ -7,6 +7,7 @@ import org.musicplayer.scripts.Queue;
 import org.musicplayer.scripts.Song;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,6 +25,7 @@ public class PlayerControls extends HBox {
     private Button previousButton;
     private Slider progressSlider;
     private MediaPlayer mediapl;
+    private Label currSongLabel = new Label("");
     private Home home;
     private Queue queue;
 
@@ -53,7 +55,6 @@ public class PlayerControls extends HBox {
         progressSlider.setValue(0);
         progressSlider.setPrefWidth(250);
         progressSlider.setStyle("-fx-cursor: hand;");
-        
 
         playButton.setOnAction(_ -> {
             playSong();
@@ -70,22 +71,31 @@ public class PlayerControls extends HBox {
         nextButton.setOnAction(_ -> {
             if (queue != null) {
                 Song next = queue.getNextSong();
-                if (next != null) home.setCurrentSong(next);
+                if (next != null)
+                    home.setCurrentSong(next);
             }
         });
         previousButton.setOnAction(_ -> {
             if (queue != null) {
                 Song prev = queue.getPreviousSong();
-                if (prev != null) home.setCurrentSong(prev);
+                if (prev != null)
+                    home.setCurrentSong(prev);
             }
         });
 
         VBox vbox = new VBox(10);
         vbox.getChildren().addAll(progressSlider, hboxButtons);
 
+        currSongLabel.setPrefWidth(200);
+        currSongLabel.setMinWidth(200);
+        currSongLabel.setMaxWidth(200);
+        currSongLabel.setAlignment(Pos.CENTER);
+        
+        HBox.setMargin(currSongLabel, new javafx.geometry.Insets(10, 0, 0, 0));
+        
         this.setSpacing(10);
         this.setPadding(new javafx.geometry.Insets(10, 0, 10, 0));
-        this.getChildren().addAll(vbox);
+        this.getChildren().addAll(currSongLabel, vbox);
     }
 
     public void setQueue(Queue queue) {
@@ -94,23 +104,25 @@ public class PlayerControls extends HBox {
         previousButton.setDisable(false);
     }
 
-    public void manageMediaPl(Queue queueObj) {
+    public void manageMediaPl(Queue queueObj, Song currentSong) {
+        currSongLabel.setText(currentSong.getName());
+
         mediapl.setOnReady(() -> {
             Duration total = mediapl.getMedia().getDuration();
             progressSlider.setMax(total.toSeconds()); // metto la durata in secondi del brano come massimo per lo slider
         });
-    
+
         mediapl.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
             progressSlider.setValue(newTime.toSeconds());
         });
 
         // per andare avanti o indietro cliccando sullo slider
-        progressSlider.valueProperty().addListener((obs, oldVal, newVal) -> { 
+        progressSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (progressSlider.isPressed()) {
                 mediapl.seek(Duration.seconds(newVal.doubleValue()));
             }
         });
-    
+
         // per andare avanti o indietro trascinando lo slider
         progressSlider.valueChangingProperty().addListener((obs, wasChanging, isChanging) -> {
             if (!isChanging) {
@@ -163,12 +175,14 @@ public class PlayerControls extends HBox {
     }
 
     public void pauseSong() {
-        if (mediapl != null) mediapl.pause();
+        if (mediapl != null)
+            mediapl.pause();
         System.out.println("pause");
     }
-    
+
     public void playSong() {
-        if (mediapl != null) mediapl.play();
+        if (mediapl != null)
+            mediapl.play();
         System.out.println("play");
     }
 
