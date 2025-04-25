@@ -8,6 +8,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.musicplayer.components.*;
@@ -19,11 +20,13 @@ public class Home extends BorderPane {
     private PlayerControls plControls;
     private PlaylistSection playlistSection;
     private MiddleSection middleSection;
+    private List<Song> queueList = new ArrayList<>();
+    private Queue queueObj;
 
     public Home() {
 
         middleSection = new MiddleSection(this);
-        playlistSection = new PlaylistSection(ManagePlaylist.fetchAllPlaylist(), middleSection);
+        playlistSection = new PlaylistSection(ManagePlaylist.fetchAllPlaylist(), middleSection, this);
         LeftBar leftBar = new LeftBar(middleSection, playlistSection, this);
         plControls = new PlayerControls(this);
 
@@ -37,6 +40,12 @@ public class Home extends BorderPane {
 
     public void showPage(Node page) {
         this.setCenter(page);
+    }
+
+    public void setQueue(Queue queue) {
+        this.queueObj = queue;
+        middleSection.setQueue(queue);
+        plControls.setQueue(queue);
     }
 
     public void setCurrentSong(Song currentSong) {
@@ -53,13 +62,14 @@ public class Home extends BorderPane {
 
         plControls.setMediaPlayer(mediaPlayer);
         plControls.setPlayingBt(true);
-        plControls.manageMediaPl();
+
+        plControls.manageMediaPl(queueObj);
     }
 
     public void updatePlaylists() {
         List<Playlist> allPl = ManagePlaylist.fetchAllPlaylist();
         playlistSection.updatePl(allPl);
-    
+
         middleSection.setPlName("");
         middleSection.updateSongs();
     }
@@ -68,5 +78,4 @@ public class Home extends BorderPane {
         return currentSong;
     }
 
-    
 }

@@ -1,6 +1,10 @@
 package org.musicplayer.components;
 
+import java.util.List;
+
 import org.musicplayer.pages.Home;
+import org.musicplayer.scripts.Queue;
+import org.musicplayer.scripts.Song;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
@@ -8,11 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.control.Slider;
-import javafx.beans.binding.Bindings;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.util.Duration;
 
@@ -24,8 +24,11 @@ public class PlayerControls extends HBox {
     private Button previousButton;
     private Slider progressSlider;
     private MediaPlayer mediapl;
+    private Home home;
+    private Queue queue;
 
     public PlayerControls(Home home) {
+        this.home = home;
         Image imgPlay = new Image(getClass().getResource("/icons/play.png").toExternalForm());
         Image imgPause = new Image(getClass().getResource("/icons/pause.png").toExternalForm());
         Image imgNext = new Image(getClass().getResource("/icons/skip_next.png").toExternalForm());
@@ -64,6 +67,19 @@ public class PlayerControls extends HBox {
             setPlayingBt(false);
         });
 
+        nextButton.setOnAction(_ -> {
+            if (queue != null) {
+                Song next = queue.getNextSong();
+                if (next != null) home.setCurrentSong(next);
+            }
+        });
+        previousButton.setOnAction(_ -> {
+            if (queue != null) {
+                Song prev = queue.getPreviousSong();
+                if (prev != null) home.setCurrentSong(prev);
+            }
+        });
+
         VBox vbox = new VBox(10);
         vbox.getChildren().addAll(progressSlider, hboxButtons);
 
@@ -72,7 +88,13 @@ public class PlayerControls extends HBox {
         this.getChildren().addAll(vbox);
     }
 
-    public void manageMediaPl() {
+    public void setQueue(Queue queue) {
+        this.queue = queue;
+        nextButton.setDisable(false);
+        previousButton.setDisable(false);
+    }
+
+    public void manageMediaPl(Queue queueObj) {
         mediapl.setOnReady(() -> {
             Duration total = mediapl.getMedia().getDuration();
             progressSlider.setMax(total.toSeconds()); // metto la durata in secondi del brano come massimo per lo slider
@@ -103,7 +125,8 @@ public class PlayerControls extends HBox {
         });
 
         mediapl.setOnEndOfMedia(() -> {
-            // prossima canzone
+            Song song = queueObj.getNextSong();
+            home.setCurrentSong(song);
         });
     }
 

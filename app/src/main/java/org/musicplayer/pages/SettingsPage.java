@@ -43,15 +43,15 @@ public class SettingsPage extends VBox {
         RadioButton bassa = new RadioButton("Bassa");
         RadioButton media = new RadioButton("Media");
         RadioButton alta = new RadioButton("Alta");
-        ToggleGroup gruppoQualita = new ToggleGroup();
-        bassa.setToggleGroup(gruppoQualita);
-        media.setToggleGroup(gruppoQualita);
-        alta.setToggleGroup(gruppoQualita);
+        ToggleGroup qualitaContainer = new ToggleGroup();
+        bassa.setToggleGroup(qualitaContainer);
+        media.setToggleGroup(qualitaContainer);
+        alta.setToggleGroup(qualitaContainer);
         media.setSelected(true);
         sezioneQualita.getChildren().addAll(etichettaQualita, bassa, media, alta);
 
-        Button bottoneIndietro = new Button("Torna alla Home");
-        bottoneIndietro.setOnAction(_ -> home.showPage(middleSection));
+        Button homeBtn = new Button("Torna alla Home");
+        homeBtn.setOnAction(_ -> home.showPage(middleSection));
 
         this.getChildren().addAll(
             titolo,
@@ -59,7 +59,7 @@ public class SettingsPage extends VBox {
             sezioneTema,
             sezioneNotifiche,
             sezioneQualita,
-            bottoneIndietro
+            homeBtn
         );
     }
 }

@@ -2,6 +2,7 @@ package org.musicplayer.components;
 
 import java.util.List;
 
+import org.musicplayer.pages.Home;
 import org.musicplayer.scripts.*;
 
 import javafx.geometry.Insets;
@@ -11,10 +12,12 @@ import javafx.scene.layout.VBox;
 public class PlaylistSection extends VBox {
 
     private MiddleSection middleSection;
+    private Home home;
 
-    public PlaylistSection(List<Playlist> playlists, MiddleSection middleSection) {
+    public PlaylistSection(List<Playlist> playlists, MiddleSection middleSection, Home home) {
         super(10); // spazio verticale
         this.middleSection = middleSection;
+        this.home = home;
         updatePl(playlists);
     }
 
@@ -31,9 +34,11 @@ public class PlaylistSection extends VBox {
             button.setMaxWidth(Double.MAX_VALUE);
             VBox.setMargin(button, new Insets(5, 0, 0, 0));
             button.setOnAction(_ -> {
-                this.middleSection.setPlName(playlist.getName());
-                this.middleSection.setPlId(playlist.getId());
-                this.middleSection.updateSongs();
+                middleSection.setPlName(playlist.getName());
+                middleSection.setPlId(playlist.getId());
+                middleSection.updateSongs();
+
+                home.setQueue(new Queue(playlist.getName(), false));
             });
 
             this.getChildren().add(button);

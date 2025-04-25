@@ -17,8 +17,7 @@ import org.musicplayer.pages.*;
 
 public class LeftBar extends VBox { // vbox = lista verticale di elementi
 
-    // final = posso poi aggiornare senza sostituire
-    private final PlaylistSection plSection;
+    private PlaylistSection plSection;
 
     public LeftBar(MiddleSection middleSection, PlaylistSection playlistSection, Home home) {
         this.plSection = playlistSection;
